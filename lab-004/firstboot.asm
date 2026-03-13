@@ -4,7 +4,9 @@
 ; 編譯: nasm -f bin firstboot.asm -o firstboot.bin
 ; ============================================================
 
+; BITS若不寫，預設為16，加上編譯是用-nf bin，會產生純二進位檔，所以這裡明確指定為16位元實模式。
 [BITS 16]           ; 實模式 16-bit
+; ORG指定程式的起始位址，BIOS會將bootloader載入到0x7C00，所以這裡設定ORG為0x7C00。
 [ORG 0x7C00]        ; BIOS 把 bootloader 載入到 0x7C00
 
 start:

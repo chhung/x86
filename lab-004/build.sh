@@ -55,7 +55,7 @@ echo ""
 echo "=============================="
 echo " 步驟 5: 啟動 Bochs"
 echo "=============================="
-bochs -f bochsrc.txt -q
+#bochs -f bochsrc.txt -q
 
 echo ""
 echo "[完成]"
