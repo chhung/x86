@@ -4,20 +4,26 @@
 ; 編譯: nasm -f bin firstboot.asm -o firstboot.bin
 ; ============================================================
 
-; BITS若不寫，預設為16，加上編譯是用-nf bin，會產生純二進位檔，所以這裡明確指定為16位元實模式。
+; 這個程式是放在磁碟機的第一個 sector (MBR) 的 bootloader，所以它的大小必須是 512 bytes，
+; 並且最後兩個 byte 必須是 0xAA55 的 boot signature，這樣 BIOS 才會認為它是一個有效的 bootloader。
+; 也就是程式最多能有 510 bytes 的程式碼和資料，剩下的 2 bytes 用來放 boot signature。
+
+; BITS若不寫，預設為16，加上編譯是用-f bin，會產生純二進位檔，就是明確指定為16位元實模式。
 [BITS 16]           ; 實模式 16-bit
 ; ORG指定程式的起始位址，BIOS會將bootloader載入到0x7C00，所以這裡設定ORG為0x7C00。
 [ORG 0x7C00]        ; BIOS 把 bootloader 載入到 0x7C00
 
 start:
     ; 初始化 segment registers
-    cli
+    ; 先關中斷，避免在設定段寄存器時被打斷，因為ax,ds, es, ss等寄存器的值在這個階段還不確定，可能會導致不可預期的行為。
+    ; 而且以上4個暫存器在下面的程式碼都會需要用到，所以先把它們都設為0，確保在後續使用時不會有問題。
+    cli             ; 關閉中斷
     xor ax, ax
     mov ds, ax
     mov es, ax
     mov ss, ax
     mov sp, 0x7C00  ; stack 在 bootloader 下方
-    sti
+    sti             ; 開啟中斷
 
     ; 顯示載入訊息
     mov si, msg_loading
